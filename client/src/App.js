@@ -3,14 +3,13 @@ import './App.css';
 import React, { Component } from 'react';
 import io from 'socket.io-client';
 
-const socket = io(); // now we have a socket
-
-socket.on('hello', (msg) => {
-    console.log(msg);
-});
+const socket = io(); // socket to the server
 
 export default class App extends Component {
-  state = { data: null };
+  state = { 
+    queue_stack: [],
+    config: {}
+  };
 
   constructor(props) {
     super(props);
@@ -18,21 +17,34 @@ export default class App extends Component {
   }
 
   componentDidMount() {
-    this.callBackendAPI()
+    this.getApi()
       .then(res => this.setState({ data: res.express }))
       .catch(err => console.log(err));
 
+    this.getConfig()
+      .then(res => this.setState({ config: res }))
+      .catch(err => console.log(err));
   }
 
-  callBackendAPI = async () => {
+  getApi = async () => {
     const response = await fetch('/api');
     const body = await response.json();
 
     if (response.status !== 200) {
-      throw Error(body.message) 
+      throw Error(body.message);
     }
     return body;
   };
+ 
+  getConfig = async () => {
+    const response = await fetch('api/config');
+    const body = await response.json();
+
+    if(response.status !== 200) {
+      throw Error(body.message);
+    }
+    return body;
+  }
 
   handleClick = () => {
     //console.log("I'm being clicked!");
