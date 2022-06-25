@@ -1,7 +1,5 @@
-import logo from './logo.svg';
-import './App.css';
-import React, { Component } from 'react';
-import io from 'socket.io-client';
+import React, { useEffect, useState } from "react";
+import io from "socket.io-client";
 
 const socket = io(); // socket to the server
 
