@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import io from "socket.io-client";
 
 const socket = io(); // socket to the server
@@ -59,11 +60,21 @@ function App() {
   };
 
   return (
-    <div className="App">
-      <header className="App-header">
-        <button onClick={handleConfigUpdate}>Config Update</button>
-      </header>
-    </div>
+    <Router>
+      <Routes>
+        <Route path="/" element={<div>Outside</div>} />
+        <Route path="/inside" element={<div>Inside</div>} />
+        <Route
+          path="/config"
+          element={
+            <div>
+              Config
+              <button onClick={handleConfigUpdate}>Config Update</button>
+            </div>
+          }
+        />
+      </Routes>
+    </Router>
   );
 }
 
