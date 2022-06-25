@@ -3,29 +3,36 @@ import io from "socket.io-client";
 
 const socket = io(); // socket to the server
 
-export default class App extends Component {
-  state = { 
-    queue_stack: [],
-    config: {}
-  };
+// Listen for something from server
+// socket.on('event-name', (data) => {
+//
+// });
 
-  constructor(props) {
-    super(props);
-    this.handleClick = this.handleClick.bind(this);
-  }
+let num = 0;
 
-  componentDidMount() {
-    this.getApi()
-      .then(res => this.setState({ data: res.express }))
-      .catch(err => console.log(err));
+function App() {
+  const [queueStack, setQueueStack] = useState(3); // default to 3 columns
+  const [runLine, setRunLine] = useState(3); // default to runline of 3
 
-    this.getConfig()
-      .then(res => this.setState({ config: res }))
-      .catch(err => console.log(err));
-  }
+  useEffect(() => {
+    getApi();
+    getConfig();
+  }, []);
 
-  getApi = async () => {
-    const response = await fetch('/api');
+  // Config has changed
+  useEffect(() => {
+    socket.on("config-update", (data) => {
+      setQueueStack(data.columns);
+      setRunLine(data.runline);
+      console.log(`${num++} Config update: ` + JSON.stringify(data));
+      //if too many queues, trim from end
+
+      //if too few queues, add to end
+    });
+  }, []);
+
+  let getApi = async () => {
+    const response = await fetch("/api");
     const body = await response.json();
 
     if (response.status !== 200) {
@@ -33,45 +40,31 @@ export default class App extends Component {
     }
     return body;
   };
- 
-  getConfig = async () => {
-    const response = await fetch('api/config');
+
+  let getConfig = async () => {
+    const response = await fetch("api/config");
     const body = await response.json();
 
-    if(response.status !== 200) {
+    if (response.status !== 200) {
       throw Error(body.message);
     }
     return body;
-  }
-
-  handleClick = () => {
-    //console.log("I'm being clicked!");
-    socket.emit('hello', 'HELLO SOCKET.IO!!!');
   };
 
-  render() {
-    const {
-      handleClick
-    } = this;
+  // Send something to server
+  // socket.emit('event-name', data);
 
-    return (
-      <div className="App">
-        <header className="App-header">
-          <img src={logo} className="App-logo" alt="logo" />
-          <p>
-            Edit <code>src/App.js</code> and save to reload.
-          </p>
-          <button onClick={handleClick}>Click me</button>
-          <a
-            className="App-link"
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-        </header>
-      </div>
-    );
+  let handleConfigUpdate = () => {
+    socket.emit("config-update", { runline: 1, columns: 1 });
   };
+
+  return (
+    <div className="App">
+      <header className="App-header">
+        <button onClick={handleConfigUpdate}>Config Update</button>
+      </header>
+    </div>
+  );
 }
+
+export default App;
