@@ -3,9 +3,13 @@ const app = express();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
-
-const port = process.env.PORT || 8080;  // this is the port we'll listen on
+const io = new Server(server, {
+  cors: {
+    origin: "*",
+    methods: "GET,HEAD,PUT,PATCH,POST,DELETE",
+  },
+});
+const port = process.env.PORT || 8080;
 
 let config = {
   runline: 3,
