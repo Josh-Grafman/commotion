@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import io from "socket.io-client";
 
-const socket = io(); // socket to the server
+const socket = io("http://localhost:8080"); // socket to the server
 
 // Listen for something from server
 // socket.on('event-name', (data) => {
